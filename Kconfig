@@ -1,0 +1,80 @@
+#
+
+config  WOLFSSL_SHA256
+	bool   "sha256"
+	default n
+
+config  WOLFSSL_SHA384
+	bool   "sha384"
+	default n
+	
+config  WOLFSSL_MD5
+	bool   "md5"
+	default n
+
+config  WOLFSSL_TLS
+	bool   "tls"
+	default n
+
+config  WOLFSSL_ECC
+	bool   "ecc"
+	default n
+
+config  WOLFSSL_AES
+	bool   "aes"
+	default n
+
+config  WOLFSSL_RSA
+	bool   "rsa"
+	default n
+
+config  WOLFSSL_DH
+	bool   "dh"
+	default n
+
+config  WOLFSSL_HMAC
+	bool   "hmac"
+	default n
+
+
+menu "wolf cipher suites"
+
+config  WOLFSSL_DHE_RSA_WITH_AES_128_GCM_SHA256
+	bool   "DHE_RSA_WITH_AES_128_GCM_SHA256"
+	select WOLFSSL_AES
+	select WOLFSSL_SHA256
+	default n
+
+config  WOLFSSL_DHE_RSA_WITH_AES_128_GCM_SHA256
+	bool   "ECDHE_RSA_WITH_AES_128_GCM_SHA256"
+	select WOLFSSL_AES
+	select WOLFSSL_SHA256
+	default n
+
+config  WOLFSSL_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	bool   "ECDHE_RSA_WITH_AES_256_GCM_SHA384"
+	select WOLFSSL_AES
+	select WOLFSSL_ECC
+	select WOLFSSL_SHA384
+	default n
+
+endmenu
+
+
+config  WOLFSSL_TLS_EXTENSIONS
+	bool   "have TLS extensions"
+	default n
+
+
+config  WOLFSSL_DONT_USE_FILESYSTEM
+	bool   "don't use filesystem"
+	default n
+
+
+config  WOLFSSL_USE_CUSTOM_RANDOM_GENERATOR
+	bool   "use custom random generator"
+	default n
+
+config WOLFSSL_GIT_MANAGER_COMMIT_HASH
+	string "wolfSSL git commit hash"
+	default ""
