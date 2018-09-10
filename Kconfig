@@ -7,7 +7,11 @@ config  WOLFSSL_SHA256
 config  WOLFSSL_SHA384
 	bool   "sha384"
 	default n
-	
+
+config  WOLFSSL_SHA512
+	bool   "sha512"
+	default n
+
 config  WOLFSSL_MD5
 	bool   "md5"
 	default n
@@ -36,26 +40,36 @@ config  WOLFSSL_HMAC
 	bool   "hmac"
 	default n
 
+config  WOLFSSL_HAVE_ALPN
+	bool   "have ALPN (application layer protocol)"
+	select WOLFSSL_TLS_EXTENSIONS
+	default n
 
 menu "wolf cipher suites"
 
 config  WOLFSSL_DHE_RSA_WITH_AES_128_GCM_SHA256
 	bool   "DHE_RSA_WITH_AES_128_GCM_SHA256"
+	select WOLFSSL_RSA
 	select WOLFSSL_AES
 	select WOLFSSL_SHA256
 	default n
 
-config  WOLFSSL_DHE_RSA_WITH_AES_128_GCM_SHA256
+config  WOLFSSL_ECDHE_RSA_WITH_AES_128_GCM_SHA256
 	bool   "ECDHE_RSA_WITH_AES_128_GCM_SHA256"
+	select WOLFSSL_RSA
 	select WOLFSSL_AES
 	select WOLFSSL_SHA256
+	select WOLFSSL_HMAC
 	default n
 
 config  WOLFSSL_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	bool   "ECDHE_RSA_WITH_AES_256_GCM_SHA384"
+	select WOLFSSL_RSA
 	select WOLFSSL_AES
 	select WOLFSSL_ECC
 	select WOLFSSL_SHA384
+	select WOLFSSL_SHA512
+	select WOLFSSL_HMAC
 	default n
 
 endmenu

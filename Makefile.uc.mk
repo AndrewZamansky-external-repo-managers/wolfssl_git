@@ -33,22 +33,6 @@ ifeq ($(strip $(CONFIG_INCLUDE_WOLFSSL)),y)
 
     DUMMY := $(call ADD_TO_GLOBAL_INCLUDE_PATH , $(WOLFSSL_PATH))
 
-    ifneq ($(strip $(CONFIG_WOLFSSL_MD5)),y)
-        DUMMY := $(call ADD_TO_GLOBAL_DEFINES , WOLFSSL_NO_MD5 )
-    endif
-
-    ifneq ($(strip $(CONFIG_WOLFSSL_DONT_USE_FILESYSTEM)),y)
-        DUMMY := $(call ADD_TO_GLOBAL_DEFINES , NO_FILESYSTEM )
-    endif
-
-
-
-
-
-    ifeq ($(strip $(CONFIG_WOLFSSL_USE_CUSTOM_RANDOM_GENERATOR)),y)
-        DEFINES +=   CUSTOM_RAND_GENERATE=custom_rand_generate
-    endif
-
     ifeq ($(CONFIG_HOST),y)
         DEFINES += COMPILING_FOR_HOST
         ifeq ($(findstring WINDOWS,$(COMPILER_HOST_OS)),WINDOWS)
@@ -80,10 +64,26 @@ ifeq ($(strip $(CONFIG_INCLUDE_WOLFSSL)),y)
 
     SRC += src/ssl.c
 
+    ifeq ($(strip $(CONFIG_WOLFSSL_HAVE_ALPN)),y)
+        DEFINES += HAVE_ALPN
+    endif
+
+    ifeq ($(strip $(CONFIG_WOLFSSL_USE_CUSTOM_RANDOM_GENERATOR)),y)
+        DEFINES += CUSTOM_RAND_GENERATE=custom_rand_generate
+    endif
+
+    ifneq ($(strip $(CONFIG_WOLFSSL_MD5)),y)
+        DEFINES += WOLFSSL_NO_MD5
+    endif
+
+    ifneq ($(strip $(CONFIG_WOLFSSL_DONT_USE_FILESYSTEM)),y)
+        DEFINES += NO_FILESYSTEM
+    endif
+
     ifneq ($(strip $(CONFIG_WOLFSSL_TLS)),y)
         DEFINES += NO_TLS
     else
-        SRC += wolfcrypt/src/tls.c
+        SRC += src/tls.c
     endif
 
     ifneq ($(strip $(CONFIG_WOLFSSL_RSA)),y)
@@ -105,13 +105,16 @@ ifeq ($(strip $(CONFIG_INCLUDE_WOLFSSL)),y)
     ifeq ($(strip $(CONFIG_WOLFSSL_DHE_RSA_WITH_AES_128_GCM_SHA256)),y)
         DEFINES += HAVE_AESGCM
     endif
+    ifeq ($(strip $(CONFIG_WOLFSSL_ECDHE_RSA_WITH_AES_128_GCM_SHA256)),y)
+        DEFINES += HAVE_AESGCM
+    endif
     ifeq ($(strip $(CONFIG_WOLFSSL_ECDHE_RSA_WITH_AES_256_GCM_SHA384)),y)
         DEFINES += HAVE_AESGCM
     endif
 
 
     ifeq ($(strip $(CONFIG_WOLFSSL_TLS_EXTENSIONS)),y)
-        DEFINES += TLS_EXTENSIONS
+        DEFINES += HAVE_TLS_EXTENSIONS
     endif
 
 
@@ -124,6 +127,11 @@ ifeq ($(strip $(CONFIG_INCLUDE_WOLFSSL)),y)
 
     ifeq ($(strip $(CONFIG_WOLFSSL_SHA384)),y)
         DEFINES += WOLFSSL_SHA384
+    endif
+
+    ifeq ($(strip $(CONFIG_WOLFSSL_SHA512)),y)
+        SRC += wolfcrypt/src/sha512.c
+        DEFINES += WOLFSSL_SHA512
     endif
 
     ifeq ($(strip $(CONFIG_WOLFSSL_SHA256)),y)
@@ -154,8 +162,9 @@ ifeq ($(strip $(CONFIG_INCLUDE_WOLFSSL)),y)
     SRC += wolfcrypt/src/memory.c
     SRC += wolfcrypt/src/wc_port.c
     SRC += wolfcrypt/src/asn.c
+    SRC += wolfcrypt/src/wc_encrypt.c
     SRC += wolfcrypt/src/integer.c
-    SRC += wolfcrypt/src/io.c
+    SRC += src/wolfio.c
     SRC += wolfcrypt/src/sha.c
     SRC += wolfcrypt/src/hash.c
     SRC += wolfcrypt/src/coding.c
@@ -164,6 +173,8 @@ ifeq ($(strip $(CONFIG_INCLUDE_WOLFSSL)),y)
 
     SPEED_CRITICAL_FILES += $(SRC)
     VPATH += | $(WOLFSSL_PATH)
+
+    DISABLE_GLOBAL_INCLUDES_PATH := y
 
 endif # CONFIG_INCLUDE_WOLFSSL = y
 
