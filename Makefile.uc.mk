@@ -53,16 +53,26 @@ ifeq ($(strip $(CONFIG_INCLUDE_WOLFSSL)),y)
         endif
     endif
 
+    INCLUDE_DIR +=$(CURR_COMPONENT_DIR)/include
 
     DEFINES += NO_DSA  NO_MD4 NO_PSK  WC_NO_RSA_OAEP NO_WOLFSSL_SERVER
     DEFINES += NO_ERROR_STRINGS NO_RC4 NO_RABBIT
     DEFINES += NO_HC128  SMALL_SESSION_CACHE  WOLFSSL_SMALL_STACK
-
+    DEFINES += SINGLE_THREADED
 
     DEFINES += WOLFSSL_STATIC_RSA
     DEFINES += NO_DES3 NO_WRITEV
+    DEFINES += WOLFSSL_USER_SETTINGS
 
     SRC += src/ssl.c
+
+    ifeq ($(strip $(CONFIG_CUSTOM_SOCKET_LAYER)),y)
+        DEFINES += USE_CUSTOM_SOCKET_IN_COMPILED_MODULE
+        DEFINES += USE_WINDOWS_API
+        DEFINES += USER_TICKS
+        SRC += src/custom_implementations.c
+    endif
+
 
     ifeq ($(strip $(CONFIG_WOLFSSL_HAVE_ALPN)),y)
         DEFINES += HAVE_ALPN
@@ -76,7 +86,7 @@ ifeq ($(strip $(CONFIG_INCLUDE_WOLFSSL)),y)
         DEFINES += WOLFSSL_NO_MD5
     endif
 
-    ifneq ($(strip $(CONFIG_WOLFSSL_DONT_USE_FILESYSTEM)),y)
+    ifeq ($(strip $(CONFIG_WOLFSSL_DONT_USE_FILESYSTEM)),y)
         DEFINES += NO_FILESYSTEM
     endif
 
