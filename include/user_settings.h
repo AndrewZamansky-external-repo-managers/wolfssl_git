@@ -11,6 +11,7 @@
 		#include <errno.h>
 		#include <unistd.h>
 		#define _strnicmp  strncasecmp
+		#define _snprintf  snprintf
 	#endif
 
 	#define WSAEWOULDBLOCK  EAGAIN
