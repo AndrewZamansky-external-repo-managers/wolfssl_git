@@ -1,62 +1,47 @@
 
-INCLUDE_THIS_COMPONENT := $(CONFIG_INCLUDE_WOLFSSL)
+WOLFSSL_GIT_COMMIT_HASH :="1179969dcf81e1e44fd35e387febd4f8ca38d85d"
 
-ifeq ($(strip $(CONFIG_INCLUDE_WOLFSSL)),y)
+WOLFSSL_PATH :=$(EXTERNAL_SOURCE_ROOT_DIR)/wolfssl
+ifeq ("$(wildcard $(WOLFSSL_PATH))","")
+    $(info   )
+    $(info --- wolfSSL path $(WOLFSSL_PATH) dont exists )
+    $(info --- get repo from andew zamansky or from https://github.com/wolfSSL/wolfssl)
+    $(info --- make sure that .git directory is located in $(WOLFSSL_PATH)/  after unpacking)
+    $(error )
+endif
 
-    EXPANDED_MAKEFILE_LIST := $(realpath $(MAKEFILE_LIST))
-    CURR_FILE_SUFFIX :=wolfssl_git/Makefile.uc.mk
-    CURR_MAKEFILE :=$(filter %$(CURR_FILE_SUFFIX), $(EXPANDED_MAKEFILE_LIST))
-    CURR_COMPONENT_DIR := $(patsubst %/Makefile.uc.mk,%,$(CURR_MAKEFILE))
+# test if current commit and branch of wolfssl git is the same as required by application
+CURR_GIT_REPO_DIR :=$(WOLFSSL_PATH)
+CURR_GIT_COMMIT_HASH_VARIABLE :=WOLFSSL_GIT_COMMIT_HASH
+CURR_GIT_BUNDLE :=$(CURR_COMPONENT_DIR)/wolfssl.bundle
+include $(MAKEFILES_ROOT_DIR)/_include_functions/git_prebuild_repo_check.mk
 
-    #test if current commit and branch of nghttp2 git is
-    # the same as required by application
-    CURR_GIT_REPO_DIR :=$(CURR_COMPONENT_DIR)
-    CURR_GIT_COMMIT_HASH_VARIABLE :=CONFIG_WOLFSSL_GIT_MANAGER_COMMIT_HASH
-    include $(MAKEFILES_ROOT_DIR)/_include_functions/git_prebuild_repo_check.mk
+DUMMY := $(call ADD_TO_GLOBAL_INCLUDE_PATH , $(WOLFSSL_PATH))
 
-    WOLFSSL_GIT_COMMIT_HASH :="1179969dcf81e1e44fd35e387febd4f8ca38d85d"
-
-    WOLFSSL_PATH :=$(EXTERNAL_SOURCE_ROOT_DIR)/wolfssl
-    ifeq ("$(wildcard $(WOLFSSL_PATH))","")
-        $(info   )
-        $(info --- wolfSSL path $(WOLFSSL_PATH) dont exists )
-        $(info --- get repo from andew zamansky or from https://github.com/wolfSSL/wolfssl)
-        $(info --- make sure that .git directory is located in $(WOLFSSL_PATH)/  after unpacking)
-        $(error )
-    endif
-
-	# test if current commit and branch of wolfssl git is the same as required by application
-	CURR_GIT_REPO_DIR :=$(WOLFSSL_PATH)
-	CURR_GIT_COMMIT_HASH_VARIABLE :=WOLFSSL_GIT_COMMIT_HASH
-	CURR_GIT_BUNDLE :=$(CURR_COMPONENT_DIR)/wolfssl.bundle
-	include $(MAKEFILES_ROOT_DIR)/_include_functions/git_prebuild_repo_check.mk
-
-    DUMMY := $(call ADD_TO_GLOBAL_INCLUDE_PATH , $(WOLFSSL_PATH))
-
-    ifeq ($(CONFIG_HOST),y)
-        DEFINES += COMPILING_FOR_HOST
-        ifeq ($(findstring WINDOWS,$(COMPILER_HOST_OS)),WINDOWS)
-            ifdef CONFIG_MICROSOFT_COMPILER
-                # disable warning C4127: conditional expression is constant
-                CFLAGS += /wd4127
-                # disable warning C4204: nonstandard
-                # extension used : non-constant aggregate initializer
-                CFLAGS += /wd4204
-                # disable warning C4214: nonstandard 
-                # extension used : bit field types other than int
-                CFLAGS += /wd4214
-                DEFINES += _CRT_SECURE_NO_WARNINGS
-            endif
-            DEFINES += COMPILING_FOR_WINDOWS_HOST
-        else
-            DEFINES += COMPILING_FOR_LINUX_HOST
+ifeq ($(CONFIG_HOST),y)
+    DEFINES += COMPILING_FOR_HOST
+    ifeq ($(findstring WINDOWS,$(COMPILER_HOST_OS)),WINDOWS)
+        ifdef CONFIG_MICROSOFT_COMPILER
+            # disable warning C4127: conditional expression is constant
+            CFLAGS += /wd4127
+            # disable warning C4204: nonstandard
+            # extension used : non-constant aggregate initializer
+            CFLAGS += /wd4204
+            # disable warning C4214: nonstandard 
+            # extension used : bit field types other than int
+            CFLAGS += /wd4214
+            DEFINES += _CRT_SECURE_NO_WARNINGS
         endif
+        DEFINES += COMPILING_FOR_WINDOWS_HOST
+    else
+        DEFINES += COMPILING_FOR_LINUX_HOST
     endif
+endif
 
-    INCLUDE_DIR +=$(CURR_COMPONENT_DIR)/include
+INCLUDE_DIR +=$(CURR_COMPONENT_DIR)/include
 
-    #DEFINES += DEBUG_WOLFSSL
-    #SRC += wolfcrypt/src/logging.c
+#DEFINES += DEBUG_WOLFSSL
+#SRC += wolfcrypt/src/logging.c
 
     DEFINES += NO_DSA  NO_MD4 NO_PSK  WC_NO_RSA_OAEP NO_WOLFSSL_SERVER
     DEFINES += NO_ERROR_STRINGS NO_RC4 NO_RABBIT
@@ -189,6 +174,5 @@ ifeq ($(strip $(CONFIG_INCLUDE_WOLFSSL)),y)
 
     DISABLE_GLOBAL_INCLUDES_PATH := y
 
-endif # CONFIG_INCLUDE_WOLFSSL = y
 
 include $(COMMON_CC)
