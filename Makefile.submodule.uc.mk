@@ -10,10 +10,12 @@ ifeq ("$(wildcard $(WOLFSSL_PATH))","")
     $(error )
 endif
 
-# test if current commit and branch of wolfssl git is the same as required by application
+# test if current commit and branch of wolfssl git is the same
+# as required by application.
+# CURR_COMPONENT_DIR is pointing to parent directory
 CURR_GIT_REPO_DIR :=$(WOLFSSL_PATH)
 CURR_GIT_COMMIT_HASH_VARIABLE :=WOLFSSL_GIT_COMMIT_HASH
-CURR_GIT_BUNDLE :=$(CURR_COMPONENT_DIR)/wolfssl.bundle
+CURR_GIT_BUNDLE :=$(CURR_COMPONENT_DIR)/wolfssl_git/wolfssl.bundle
 include $(MAKEFILES_ROOT_DIR)/_include_functions/git_prebuild_repo_check.mk
 
 DUMMY := $(call ADD_TO_GLOBAL_INCLUDE_PATH , $(WOLFSSL_PATH))
@@ -27,7 +29,7 @@ ifeq ($(CONFIG_HOST),y)
             # disable warning C4204: nonstandard
             # extension used : non-constant aggregate initializer
             CFLAGS += /wd4204
-            # disable warning C4214: nonstandard 
+            # disable warning C4214: nonstandard
             # extension used : bit field types other than int
             CFLAGS += /wd4214
             DEFINES += _CRT_SECURE_NO_WARNINGS
@@ -38,7 +40,8 @@ ifeq ($(CONFIG_HOST),y)
     endif
 endif
 
-INCLUDE_DIR +=$(CURR_COMPONENT_DIR)/include
+# CURR_COMPONENT_DIR is pointing to parent directory
+INCLUDE_DIR +=$(CURR_COMPONENT_DIR)/wolfssl_git/include
 
 #DEFINES += DEBUG_WOLFSSL
 #SRC += wolfcrypt/src/logging.c
