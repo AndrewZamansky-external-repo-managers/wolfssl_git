@@ -4,7 +4,7 @@
 #include "project_config.h"
 #include "os_wrapper.h"
 
-#ifdef CONFIG_CUSTOM_SOCKET_LAYER
+#ifdef CONFIG_USE_INTERNAL_SOCKETS_IMPLEMENTATION
 
 	#define _strnicmp  strncasecmp
 
