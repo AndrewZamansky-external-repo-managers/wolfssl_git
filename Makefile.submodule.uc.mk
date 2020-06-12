@@ -43,6 +43,10 @@ endif
 # CURR_COMPONENT_DIR is pointing to parent directory
 INCLUDE_DIR +=$(CURR_COMPONENT_DIR)/wolfssl_git/include
 
+# following macro was added from some gcc version (at least from 9.2)
+# defining it will open typdefs like ulong
+DEFINES += _GNU_SOURCE
+
 #DEFINES += DEBUG_WOLFSSL
 #SRC += wolfcrypt/src/logging.c
 
