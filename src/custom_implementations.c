@@ -11,12 +11,12 @@
     {
         return (int32_t)time(0);
     }
+#else
+	int32_t LowResTimer(void)
+	{
+		return (int32_t)0;
+	}
 #endif
-
-int32_t LowResTimer(void)
-{
-	return (int32_t)0;
-}
 
 #include <sys/time.h>
 
